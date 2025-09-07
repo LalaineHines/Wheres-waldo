@@ -1,0 +1,62 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Leaderboard {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  time      Int
+  timestamp DateTime @default(now())
+}
+
+model Character {
+  id     String            @id @default(uuid())
+  name   String
+  coords CharacterCoords[]
+}
+
+model Image {
+  id              String            @id @default(uuid())
+  name            String
+  url             String
+  iconUrl         String
+  width           Int
+  height          Int
+  characterCoords CharacterCoords[]
+  gameRounds      GameRound[]
+}
+
+model CharacterCoords {
+  id          String    @id @default(uuid())
+  xCoord      Int
+  yCoord      Int
+  width       Int
+  height      Int
+  image       Image     @relation(fields: [imageId], references: [id], onDelete: Cascade)
+  imageId     String
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  characterId String
+}
+
+model GameRound {
+  id        String    @id @default(uuid())
+  startTime DateTime  @default(now())
+  endTime   DateTime?
+  waldo     Boolean   @default(false)
+  wizard    Boolean   @default(false)
+  wilma     Boolean   @default(false)
+  image     Image     @relation(fields: [imageId], references: [id], onDelete: Cascade)
+  imageId   String
+}
